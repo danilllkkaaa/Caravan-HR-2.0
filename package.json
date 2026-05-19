@@ -1,0 +1,36 @@
+{
+  "name": "corp-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Corporate HR Portal Monorepo",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json,yaml}\" --ignore-path .gitignore"
+  },
+  "devDependencies": {
+    "pnpm": "10.28.2",
+    "prettier": "^3.3.3",
+    "turbo": "^2.1.3",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@xmldom/xmldom": ">=0.8.13",
+      "fast-xml-parser": ">=5.7.0",
+      "postcss": ">=8.5.10",
+      "semver": ">=7.5.2",
+      "serialize-javascript": ">=7.0.5",
+      "tar": ">=7.5.11"
+    }
+  },
+  "packageManager": "pnpm@10.28.2"
+}

@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Caravan HR",
+    "slug": "caravan-hr",
+    "scheme": "caravanhr",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "platforms": ["ios", "android"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "kz.caravan.hr"
+    },
+    "android": {
+      "package": "kz.caravan.hr"
+    },
+    "plugins": ["expo-router", "expo-secure-store"]
+  }
+}

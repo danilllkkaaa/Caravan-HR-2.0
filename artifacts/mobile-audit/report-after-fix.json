@@ -1,0 +1,264 @@
+{
+  "viewport": "390x844 DPR 3 mobile",
+  "pages": [
+    {
+      "name": "login",
+      "audit": {
+        "url": "http://localhost:3000/login/",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": [
+          {
+            "tag": "button",
+            "text": "Показать пароль",
+            "w": 16,
+            "h": 16
+          }
+        ],
+        "bodyText": "Корпоративный портал\n\nHR-система компании\n\nВход в систему\n\nВведите корпоративный email и пароль\n\nEmail\nПароль\nВойти\n\n© 2"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\fix-01-login.png"
+    },
+    {
+      "name": "home",
+      "audit": {
+        "url": "http://localhost:3000/",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": [
+          {
+            "tag": "a",
+            "text": "Все уведомления",
+            "w": 98,
+            "h": 16
+          }
+        ],
+        "bodyText": "Главная\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\n"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\fix-02-home.png"
+    },
+    {
+      "name": "personal-data",
+      "audit": {
+        "url": "http://localhost:3000/personal-data/",
+        "clientWidth": 390,
+        "scrollWidth": 1024,
+        "overflow": true,
+        "overflowEls": [
+          {
+            "tag": "header",
+            "text": "Личные данные\n1",
+            "left": 0,
+            "right": 1024,
+            "width": 1024
+          },
+          {
+            "tag": "div",
+            "text": "Личные данные\n1",
+            "left": 0,
+            "right": 1024,
+            "width": 1024
+          },
+          {
+            "tag": "a",
+            "text": "1",
+            "left": 976,
+            "right": 1012,
+            "width": 36
+          },
+          {
+            "tag": "svg",
+            "text": "[object SVGAnimatedString]",
+            "left": 984,
+            "right": 1004,
+            "width": 20
+          },
+          {
+            "tag": "path",
+            "text": "[object SVGAnimatedString]",
+            "left": 987,
+            "right": 1002,
+            "width": 15
+          },
+          {
+            "tag": "span",
+            "text": "1",
+            "left": 990,
+            "right": 1006,
+            "width": 16
+          },
+          {
+            "tag": "nav",
+            "text": "Главная\nОтпуска\nБольничный\n1\nУведомления\nЕщё",
+            "left": 0,
+            "right": 1024,
+            "width": 1024
+          },
+          {
+            "tag": "div",
+            "text": "Главная\nОтпуска\nБольничный\n1\nУведомления\nЕщё",
+            "left": 0,
+            "right": 1024,
+            "width": 1024
+          },
+          {
+            "tag": "a",
+            "text": "Отпуска",
+            "left": 207,
+            "right": 410,
+            "width": 203
+          },
+          {
+            "tag": "a",
+            "text": "Больничный",
+            "left": 410,
+            "right": 614,
+            "width": 203
+          },
+          {
+            "tag": "svg",
+            "text": "[object SVGAnimatedString]",
+            "left": 502,
+            "right": 522,
+            "width": 20
+          },
+          {
+            "tag": "path",
+            "text": "[object SVGAnimatedString]",
+            "left": 509,
+            "right": 515,
+            "width": 7
+          }
+        ],
+        "smallTargets": [],
+        "bodyText": "Личные данные\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГл"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\fix-03-personal-data.png"
+    },
+    {
+      "name": "vacations",
+      "audit": {
+        "url": "http://localhost:3000/vacations/",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": [
+          {
+            "tag": "button",
+            "text": "2026",
+            "w": 51,
+            "h": 28
+          },
+          {
+            "tag": "button",
+            "text": "2025",
+            "w": 53,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "2024",
+            "w": 53,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "2023",
+            "w": 53,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "Все",
+            "w": 45,
+            "h": 28
+          },
+          {
+            "tag": "button",
+            "text": "На рассмотрении",
+            "w": 124,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "Утверждённые",
+            "w": 109,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "Отклонённые",
+            "w": 102,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "Отменённые",
+            "w": 98,
+            "h": 30
+          },
+          {
+            "tag": "a",
+            "text": "Подайте новую заявку",
+            "w": 146,
+            "h": 16
+          }
+        ],
+        "bodyText": "Отпуска\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\n"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\fix-04-vacations.png"
+    },
+    {
+      "name": "approvals",
+      "audit": {
+        "url": "http://localhost:3000/approvals/",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": [],
+        "bodyText": "Согласования\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГла"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\fix-05-approvals.png"
+    },
+    {
+      "name": "notifications",
+      "audit": {
+        "url": "http://localhost:3000/notifications/",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": [],
+        "bodyText": "Уведомления\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлав"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\fix-06-notifications.png"
+    },
+    {
+      "name": "profile-sessions",
+      "audit": {
+        "url": "http://localhost:3000/profile/sessions/",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": [],
+        "bodyText": "Профиль\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\n"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\fix-07-profile-sessions.png"
+    }
+  ],
+  "events": [
+    {
+      "type": "log",
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "url": "http://localhost:3000/favicon.ico"
+    }
+  ]
+}

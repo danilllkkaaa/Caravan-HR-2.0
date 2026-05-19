@@ -1,0 +1,61 @@
+{
+  "pages": [
+    {
+      "name": "home",
+      "audit": {
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "bodyText": "Главная\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольничный\n1\nУведомления\nЕщё\nДоб"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\final-home.png"
+    },
+    {
+      "name": "personal-data",
+      "audit": {
+        "clientWidth": 390,
+        "scrollWidth": 1024,
+        "overflow": true,
+        "bodyText": "Личные данные\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольничный\n1\nУведомления\nЕ"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\final-personal-data.png"
+    },
+    {
+      "name": "personal-basic",
+      "audit": {
+        "clientWidth": 390,
+        "scrollWidth": 1024,
+        "overflow": true,
+        "bodyText": "Личные данные\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольничный\n1\nУведомления\nЕ"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\final-personal-basic.png"
+    },
+    {
+      "name": "vacations",
+      "audit": {
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "bodyText": "Отпуска\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольничный\n1\nУведомления\nЕщё\nМои"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\final-vacations.png"
+    },
+    {
+      "name": "approvals",
+      "audit": {
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "bodyText": "Согласования\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольничный\n1\nУведомления\nЕщ"
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\final-approvals.png"
+    }
+  ],
+  "events": [
+    {
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "url": "http://localhost:3000/favicon.ico"
+    }
+  ]
+}

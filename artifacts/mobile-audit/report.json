@@ -1,0 +1,271 @@
+{
+  "viewport": "390x844 DPR 3 mobile",
+  "pages": [
+    {
+      "name": "login",
+      "audit": {
+        "url": "http://localhost:3000/login/",
+        "title": "Вход в систему | Корпоративный портал",
+        "bodyText": "Корпоративный портал\n\nHR-система компании\n\nВход в систему\n\nВведите корпоративный email и пароль\n\nEmail\nПароль\nВойти\n\n© 2026 Корпоративный по",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": [
+          {
+            "tag": "button",
+            "text": "Показать пароль",
+            "w": 16,
+            "h": 16
+          }
+        ]
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\01-login.png"
+    },
+    {
+      "name": "home",
+      "audit": {
+        "url": "http://localhost:3000/",
+        "title": "Корпоративный портал",
+        "bodyText": "Главная\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольничный\n1",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": [
+          {
+            "tag": "a",
+            "text": "Все уведомления",
+            "w": 98,
+            "h": 16
+          }
+        ]
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\02-home.png"
+    },
+    {
+      "name": "personal-data",
+      "audit": {
+        "url": "http://localhost:3000/personal-data/",
+        "title": "Корпоративный портал",
+        "bodyText": "Личные данные\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольни",
+        "clientWidth": 390,
+        "scrollWidth": 1170,
+        "overflow": true,
+        "overflowEls": [
+          {
+            "tag": "header",
+            "text": "Личные данные\n1",
+            "left": 0,
+            "right": 1170,
+            "width": 1170
+          },
+          {
+            "tag": "div",
+            "text": "Личные данные\n1",
+            "left": 0,
+            "right": 1170,
+            "width": 1170
+          },
+          {
+            "tag": "a",
+            "text": "1",
+            "left": 1122,
+            "right": 1158,
+            "width": 36
+          },
+          {
+            "tag": "svg",
+            "text": "[object SVGAnimatedString]",
+            "left": 1130,
+            "right": 1150,
+            "width": 20
+          },
+          {
+            "tag": "path",
+            "text": "[object SVGAnimatedString]",
+            "left": 1133,
+            "right": 1148,
+            "width": 15
+          },
+          {
+            "tag": "span",
+            "text": "1",
+            "left": 1136,
+            "right": 1152,
+            "width": 16
+          },
+          {
+            "tag": "nav",
+            "text": "Главная\nОтпуска\nБольничный\n1\nУведомления\nЕщё",
+            "left": 0,
+            "right": 1170,
+            "width": 1170
+          },
+          {
+            "tag": "div",
+            "text": "Главная\nОтпуска\nБольничный\n1\nУведомления\nЕщё",
+            "left": 0,
+            "right": 1170,
+            "width": 1170
+          },
+          {
+            "tag": "a",
+            "text": "Отпуска",
+            "left": 236,
+            "right": 469,
+            "width": 232
+          },
+          {
+            "tag": "a",
+            "text": "Больничный",
+            "left": 469,
+            "right": 701,
+            "width": 232
+          },
+          {
+            "tag": "svg",
+            "text": "[object SVGAnimatedString]",
+            "left": 575,
+            "right": 595,
+            "width": 20
+          },
+          {
+            "tag": "path",
+            "text": "[object SVGAnimatedString]",
+            "left": 582,
+            "right": 588,
+            "width": 7
+          }
+        ],
+        "smallTargets": []
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\03-personal-data.png"
+    },
+    {
+      "name": "vacations",
+      "audit": {
+        "url": "http://localhost:3000/vacations/",
+        "title": "Корпоративный портал",
+        "bodyText": "Отпуска\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольничный\n1",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": [
+          {
+            "tag": "button",
+            "text": "2026",
+            "w": 51,
+            "h": 28
+          },
+          {
+            "tag": "button",
+            "text": "2025",
+            "w": 53,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "2024",
+            "w": 53,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "2023",
+            "w": 53,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "Все",
+            "w": 45,
+            "h": 28
+          },
+          {
+            "tag": "button",
+            "text": "На рассмотрении",
+            "w": 124,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "Утверждённые",
+            "w": 109,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "Отклонённые",
+            "w": 102,
+            "h": 30
+          },
+          {
+            "tag": "button",
+            "text": "Отменённые",
+            "w": 98,
+            "h": 30
+          },
+          {
+            "tag": "a",
+            "text": "Подайте новую заявку",
+            "w": 146,
+            "h": 16
+          }
+        ]
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\04-vacations.png"
+    },
+    {
+      "name": "approvals",
+      "audit": {
+        "url": "http://localhost:3000/approvals/",
+        "title": "Корпоративный портал",
+        "bodyText": "Согласования\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольнич",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": []
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\05-approvals.png"
+    },
+    {
+      "name": "notifications",
+      "audit": {
+        "url": "http://localhost:3000/notifications/",
+        "title": "Корпоративный портал",
+        "bodyText": "Уведомления\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольничн",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": []
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\06-notifications.png"
+    },
+    {
+      "name": "profile-sessions",
+      "audit": {
+        "url": "http://localhost:3000/profile/sessions/",
+        "title": "Корпоративный портал",
+        "bodyText": "Профиль\n1\nМеню\nТабель\nЛичные данные\nПрофиль\nСотрудники\nСогласования\nMD\n\nDemo Manager\n\nmanager\n\nВыйти из системы\nГлавная\nОтпуска\nБольничный\n1",
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "overflow": false,
+        "overflowEls": [],
+        "smallTargets": []
+      },
+      "screenshot": "C:\\Users\\palag\\Desktop\\Claude\\Caravan-HR 2.0\\artifacts\\mobile-audit\\07-profile-sessions.png"
+    }
+  ],
+  "events": [
+    {
+      "type": "log",
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "url": "http://localhost:3000/favicon.ico"
+    }
+  ]
+}
