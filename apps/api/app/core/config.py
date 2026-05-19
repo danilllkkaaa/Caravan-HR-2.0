@@ -44,10 +44,13 @@ class Settings(BaseSettings):
 
     # MinIO
     minio_endpoint: str = "localhost:9000"
+    minio_public_endpoint: str = ""
     minio_access_key: str = "minioadmin"
     minio_secret_key: str = "minioadmin"
+    minio_region: str = "us-east-1"
     minio_bucket_sick_leave: str = "sick-leave-documents"
     minio_secure: bool = False
+    minio_public_secure: bool | None = None
 
     # Sentry
     sentry_dsn: str = ""
@@ -72,7 +75,7 @@ class Settings(BaseSettings):
     firebase_credentials_path: str = ""
 
     # Encryption (Fernet) – generate with: Fernet.generate_key().decode()
-    fernet_key: str = "CHANGE_ME_FERNET_KEY_32_BYTES_BASE64=="
+    fernet_key: str = "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
 
     # MinIO personal-data bucket
     minio_bucket_personal_data: str = "personal-data-documents"

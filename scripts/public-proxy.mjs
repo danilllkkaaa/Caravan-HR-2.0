@@ -6,6 +6,14 @@ import { extname, join, normalize, resolve } from 'node:path';
 const root = resolve('apps/web/out');
 const port = Number(process.env.PUBLIC_PROXY_PORT ?? 3100);
 const apiTarget = new URL(process.env.API_TARGET ?? 'http://127.0.0.1:8001');
+const storageTarget = new URL(process.env.STORAGE_TARGET ?? 'http://127.0.0.1:9000');
+const storageBuckets = (
+  process.env.STORAGE_BUCKETS ??
+  'sick-leave-documents,personal-data-documents,portal-avatars,portal-documents'
+)
+  .split(',')
+  .map((bucket) => bucket.trim())
+  .filter(Boolean);
 
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -79,11 +87,43 @@ function proxyApi(req, res) {
   req.pipe(proxyReq);
 }
 
+function proxyStorage(req, res) {
+  const target = new URL(req.url ?? '/', storageTarget);
+  const proxyReq = httpRequest(
+    {
+      hostname: target.hostname,
+      port: target.port,
+      path: target.pathname + target.search,
+      method: req.method,
+      headers: {
+        ...req.headers,
+        host: req.headers.host,
+      },
+    },
+    (proxyRes) => {
+      res.writeHead(proxyRes.statusCode ?? 502, proxyRes.headers);
+      proxyRes.pipe(res);
+    }
+  );
+
+  proxyReq.on('error', () => {
+    res.writeHead(502, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ error: 'Storage proxy unavailable' }));
+  });
+
+  req.pipe(proxyReq);
+}
+
 createServer(async (req, res) => {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
 
   if (url.pathname.startsWith('/api/')) {
     proxyApi(req, res);
+    return;
+  }
+
+  if (storageBuckets.some((bucket) => url.pathname.startsWith(`/${bucket}/`))) {
+    proxyStorage(req, res);
     return;
   }
 
@@ -105,4 +145,5 @@ createServer(async (req, res) => {
 }).listen(port, '0.0.0.0', () => {
   console.log(`Public proxy listening on http://localhost:${port}`);
   console.log(`API proxy target ${apiTarget.href}`);
+  console.log(`Storage proxy target ${storageTarget.href}`);
 });

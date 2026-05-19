@@ -9,6 +9,8 @@ from pydantic import BaseModel
 
 from app.api.deps import CurrentEmployee, DBSession
 from app.application.services.sick_leave import SickLeaveService
+from app.core.config import get_settings
+from app.core.minio import generate_download_url
 from app.infrastructure.repositories.sick_leave import SickLeaveRepository
 
 router = APIRouter(prefix="/sick-leaves", tags=["sick-leaves"])
@@ -32,6 +34,15 @@ class AttachDocumentRequest(BaseModel):
     document_url: str
 
 
+def _format_document_url(document_url: str | None) -> str | None:
+    if not document_url:
+        return None
+    if document_url.startswith(("http://", "https://")):
+        return document_url
+    settings = get_settings()
+    return generate_download_url(settings.minio_bucket_sick_leave, document_url)
+
+
 def _format_sl(sl: Any) -> dict[str, Any]:
     return {
         "id": str(sl.id),
@@ -40,7 +51,7 @@ def _format_sl(sl: Any) -> dict[str, Any]:
         "end_date": sl.end_date.isoformat() if sl.end_date else None,
         "open_comment": sl.open_comment,
         "close_comment": sl.close_comment,
-        "document_url": sl.document_url,
+        "document_url": _format_document_url(sl.document_url),
         "status": sl.status,
         "closed_by": str(sl.closed_by) if sl.closed_by else None,
         "created_at": sl.created_at.isoformat(),

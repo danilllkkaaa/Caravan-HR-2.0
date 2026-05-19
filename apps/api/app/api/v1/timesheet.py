@@ -32,8 +32,8 @@ def _format_entry(e: TimesheetEntry) -> dict[str, Any]:
 async def list_timesheet(
     employee: CurrentEmployee,
     db: DBSession,
-    date_from: date = Query(default=None),
-    date_to: date = Query(default=None),
+    date_from: date | None = Query(default=None),
+    date_to: date | None = Query(default=None),
 ) -> dict[str, Any]:
     today = date.today()
     if date_from is None:
@@ -63,8 +63,8 @@ async def list_timesheet(
 async def get_timesheet_summary(
     employee: CurrentEmployee,
     db: DBSession,
-    date_from: date = Query(default=None),
-    date_to: date = Query(default=None),
+    date_from: date | None = Query(default=None),
+    date_to: date | None = Query(default=None),
 ) -> dict[str, Any]:
     today = date.today()
     if date_from is None:

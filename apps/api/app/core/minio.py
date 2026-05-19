@@ -8,6 +8,7 @@ from minio import Minio
 from app.core.config import get_settings
 
 _client: Minio | None = None
+_presign_client: Minio | None = None
 
 
 def get_minio_client() -> Minio:
@@ -19,8 +20,29 @@ def get_minio_client() -> Minio:
             access_key=settings.minio_access_key,
             secret_key=settings.minio_secret_key,
             secure=settings.minio_secure,
+            region=settings.minio_region,
         )
     return _client
+
+
+def get_minio_presign_client() -> Minio:
+    global _presign_client
+    if _presign_client is None:
+        settings = get_settings()
+        endpoint = settings.minio_public_endpoint or settings.minio_endpoint
+        secure = (
+            settings.minio_public_secure
+            if settings.minio_public_secure is not None
+            else settings.minio_secure
+        )
+        _presign_client = Minio(
+            endpoint,
+            access_key=settings.minio_access_key,
+            secret_key=settings.minio_secret_key,
+            secure=secure,
+            region=settings.minio_region,
+        )
+    return _presign_client
 
 
 def generate_upload_url(
@@ -31,7 +53,7 @@ def generate_upload_url(
     """Return (presigned_put_url, object_key)."""
     from datetime import timedelta
 
-    client = get_minio_client()
+    client = get_minio_presign_client()
     object_key = f"{prefix}/{uuid.uuid4()}"
     url = client.presigned_put_object(
         bucket, object_key, expires=timedelta(seconds=expires_seconds)
@@ -47,7 +69,7 @@ def generate_download_url(
     """Return presigned GET URL."""
     from datetime import timedelta
 
-    client = get_minio_client()
+    client = get_minio_presign_client()
     return client.presigned_get_object(
         bucket, object_key, expires=timedelta(seconds=expires_seconds)
     )

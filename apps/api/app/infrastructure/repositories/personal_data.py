@@ -14,7 +14,9 @@ from app.infrastructure.models import (
     CitizenshipRecord,
     EducationRecord,
     EmergencyContact,
+    Employee,
     EmployeeAddress,
+    EmployeeContact,
     FamilyMember,
     IdentityDocument,
     MedicalCertificate,
@@ -265,6 +267,34 @@ class PersonalDataRepository:
         await self._session.refresh(existing)
         return existing
 
+    # ---- employee_contacts ----
+
+    async def get_employee_contact(self, employee_id: uuid.UUID) -> EmployeeContact | None:
+        stmt = select(EmployeeContact).where(EmployeeContact.employee_id == employee_id)
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def upsert_employee_contact(
+        self, employee_id: uuid.UUID, data: dict[str, Any]
+    ) -> EmployeeContact:
+        row = await self.get_employee_contact(employee_id)
+        if row is None:
+            row = EmployeeContact(id=uuid.uuid4(), employee_id=employee_id, **data)
+            self._session.add(row)
+        else:
+            for key, value in data.items():
+                setattr(row, key, value)
+
+        mobile_phone = data.get("mobile_phone")
+        if mobile_phone:
+            employee = await self._session.get(Employee, employee_id)
+            if employee is not None:
+                employee.phone = mobile_phone
+
+        await self._session.flush()
+        await self._session.refresh(row)
+        return row
+
     # ---- social_info ----
 
     async def get_social_info(self, employee_id: uuid.UUID) -> SocialInfo | None:
@@ -376,6 +406,17 @@ class ChangeRequestRepository:
         stmt = select(PersonalDataChangeRequest).where(
             PersonalDataChangeRequest.hr_email == hr_email
         )
+        if status:
+            stmt = stmt.where(PersonalDataChangeRequest.status == status)
+        stmt = stmt.order_by(PersonalDataChangeRequest.created_at.desc())
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def list_all(
+        self,
+        status: str | None = None,
+    ) -> list[PersonalDataChangeRequest]:
+        stmt = select(PersonalDataChangeRequest)
         if status:
             stmt = stmt.where(PersonalDataChangeRequest.status == status)
         stmt = stmt.order_by(PersonalDataChangeRequest.created_at.desc())

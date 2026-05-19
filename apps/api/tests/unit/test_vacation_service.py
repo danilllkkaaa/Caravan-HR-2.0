@@ -201,3 +201,63 @@ async def test_approve_request_consumes_balance(service: VacationService) -> Non
         vr.employee_id, 2026, float(vr.days_count)
     )
     service._notifications.create.assert_awaited()
+
+
+@pytest.mark.asyncio
+async def test_approve_request_stops_if_locked_balance_is_insufficient(
+    service: VacationService,
+) -> None:
+    manager = _employee()
+    manager.role = "manager"
+
+    vr = VacationRequestDomain(
+        id=uuid.uuid4(),
+        employee_id=uuid.uuid4(),
+        vacation_type_id=uuid.uuid4(),
+        start_date=date(2026, 9, 1),
+        end_date=date(2026, 9, 5),
+        days_count=5,
+        comment=None,
+        status="pending",
+        approver_id=manager.id,
+        approver_comment=None,
+        approved_at=None,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    approved = VacationRequestDomain(
+        id=vr.id,
+        employee_id=vr.employee_id,
+        vacation_type_id=vr.vacation_type_id,
+        start_date=vr.start_date,
+        end_date=vr.end_date,
+        days_count=vr.days_count,
+        comment=vr.comment,
+        status="approved",
+        approver_id=manager.id,
+        approver_comment=None,
+        approved_at=datetime.now(UTC),
+        created_at=vr.created_at,
+        updated_at=datetime.now(UTC),
+    )
+    balance = VacationBalanceDomain(
+        id=uuid.uuid4(),
+        employee_id=vr.employee_id,
+        year=2026,
+        total_days=Decimal("20"),
+        used_days=Decimal("0"),
+        sync_source="manual",
+        updated_at=datetime.now(UTC),
+    )
+
+    service._repo.get_request_by_id = AsyncMock(return_value=vr)
+    service._repo.get_type_by_id = AsyncMock(return_value=_paid_type())
+    service._repo.get_balance = AsyncMock(return_value=balance)
+    service._repo.update_request = AsyncMock(return_value=approved)
+    service._repo.consume_balance = AsyncMock(side_effect=InsufficientBalanceError())
+
+    with pytest.raises(InsufficientBalanceError):
+        await service.approve_request(vr.id, manager, None)
+
+    service._notifications.create.assert_not_awaited()
+    service._audit.log.assert_not_awaited()

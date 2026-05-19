@@ -13,27 +13,25 @@ import { formatTime, formatHours } from '@corp-portal/ui-core';
 import clsx from 'clsx';
 
 const STATUS_COLORS: Record<TimesheetStatus, string> = {
-  [TimesheetStatus.Present]: 'bg-success-100 text-success-700 border-success-200',
-  [TimesheetStatus.Remote]: 'bg-accent-100 text-accent-700 border-accent-200',
-  [TimesheetStatus.Absent]: 'bg-danger-100 text-danger-700 border-danger-200',
+  [TimesheetStatus.Work]: 'bg-success-100 text-success-700 border-success-200',
+  [TimesheetStatus.Overtime]: 'bg-accent-100 text-accent-700 border-accent-200',
+  [TimesheetStatus.Partial]: 'bg-orange-100 text-orange-700 border-orange-200',
+  [TimesheetStatus.Absence]: 'bg-danger-100 text-danger-700 border-danger-200',
   [TimesheetStatus.Holiday]: 'bg-purple-100 text-purple-700 border-purple-200',
   [TimesheetStatus.Weekend]: 'bg-gray-100 text-gray-400 border-gray-200',
-  [TimesheetStatus.OnVacation]: 'bg-blue-100 text-blue-700 border-blue-200',
-  [TimesheetStatus.SickLeave]: 'bg-warning-100 text-warning-700 border-warning-200',
-  [TimesheetStatus.BusinessTrip]: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  [TimesheetStatus.HalfDay]: 'bg-orange-100 text-orange-700 border-orange-200',
+  [TimesheetStatus.Vacation]: 'bg-blue-100 text-blue-700 border-blue-200',
+  [TimesheetStatus.Sick]: 'bg-warning-100 text-warning-700 border-warning-200',
 };
 
 const STATUS_LABELS: Record<TimesheetStatus, string> = {
-  [TimesheetStatus.Present]: 'На работе',
-  [TimesheetStatus.Remote]: 'Удалённо',
-  [TimesheetStatus.Absent]: 'Отсутствие',
+  [TimesheetStatus.Work]: 'На работе',
+  [TimesheetStatus.Overtime]: 'Сверхурочно',
+  [TimesheetStatus.Partial]: 'Неполный день',
+  [TimesheetStatus.Absence]: 'Отсутствие',
   [TimesheetStatus.Holiday]: 'Праздник',
   [TimesheetStatus.Weekend]: 'Выходной',
-  [TimesheetStatus.OnVacation]: 'Отпуск',
-  [TimesheetStatus.SickLeave]: 'Больничный',
-  [TimesheetStatus.BusinessTrip]: 'Командировка',
-  [TimesheetStatus.HalfDay]: 'Неполный день',
+  [TimesheetStatus.Vacation]: 'Отпуск',
+  [TimesheetStatus.Sick]: 'Больничный',
 };
 
 const WEEKDAY_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
@@ -313,10 +311,10 @@ export default function TimesheetPage() {
           {/* Legend */}
           <div className="mt-4 pt-4 border-t border-gray-50 flex flex-wrap gap-2">
             {[
-              { status: TimesheetStatus.Present, label: 'Работа' },
-              { status: TimesheetStatus.Remote, label: 'Удалённо' },
-              { status: TimesheetStatus.OnVacation, label: 'Отпуск' },
-              { status: TimesheetStatus.SickLeave, label: 'Больничный' },
+              { status: TimesheetStatus.Work, label: 'Работа' },
+              { status: TimesheetStatus.Overtime, label: 'Сверхурочно' },
+              { status: TimesheetStatus.Vacation, label: 'Отпуск' },
+              { status: TimesheetStatus.Sick, label: 'Больничный' },
               { status: TimesheetStatus.Holiday, label: 'Праздник' },
             ].map(({ status, label }) => (
               <div key={status} className="flex items-center gap-1.5">

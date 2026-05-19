@@ -12,8 +12,7 @@ export enum Role {
 export enum VacationRequestStatus {
   Draft = 'draft',
   Pending = 'pending',
-  ApprovedByManager = 'approved_by_manager',
-  ApprovedByHR = 'approved_by_hr',
+  Approved = 'approved',
   Rejected = 'rejected',
   Cancelled = 'cancelled',
 }
@@ -21,20 +20,17 @@ export enum VacationRequestStatus {
 export enum SickLeaveStatus {
   Open = 'open',
   Closed = 'closed',
-  Confirmed = 'confirmed',
-  Rejected = 'rejected',
 }
 
 export enum TimesheetStatus {
-  Present = 'present',
-  Absent = 'absent',
+  Work = 'work',
+  Overtime = 'overtime',
+  Partial = 'partial',
+  Absence = 'absence',
   Holiday = 'holiday',
   Weekend = 'weekend',
-  OnVacation = 'on_vacation',
-  SickLeave = 'sick_leave',
-  BusinessTrip = 'business_trip',
-  Remote = 'remote',
-  HalfDay = 'half_day',
+  Vacation = 'vacation',
+  Sick = 'sick',
 }
 
 export enum NotificationType {
@@ -205,19 +201,19 @@ export interface SickLeave {
 // ============================================================
 
 export interface TimesheetEntry {
-  id: number;
-  employeeId: number;
+  id: string;
+  employeeId: string;
   date: string;
   status: TimesheetStatus;
   checkIn: string | null;
   checkOut: string | null;
   hoursWorked: number | null;
   overtimeHours: number | null;
-  locationId: number | null;
+  locationId: string | null;
   location: WorkLocation | null;
   note: string | null;
   isManualEntry: boolean;
-  approvedById: number | null;
+  approvedById: string | null;
   approvedAt: string | null;
   createdAt: string;
   updatedAt: string;

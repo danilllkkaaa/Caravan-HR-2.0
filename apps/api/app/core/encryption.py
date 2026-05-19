@@ -4,12 +4,19 @@ from __future__ import annotations
 from cryptography.fernet import Fernet, InvalidToken
 
 from app.core.config import get_settings
+from app.core.exceptions import ValidationError
 
 
 def _get_fernet() -> Fernet:
     settings = get_settings()
     key: str = settings.fernet_key  # base64-urlsafe 32-byte key, set in .env
-    return Fernet(key.encode() if isinstance(key, str) else key)
+    try:
+        return Fernet(key.encode() if isinstance(key, str) else key)
+    except (ValueError, TypeError) as exc:
+        raise ValidationError(
+            message="Invalid FERNET_KEY configuration",
+            details={"hint": "Generate a key with Fernet.generate_key().decode()."},
+        ) from exc
 
 
 def encrypt_field(plaintext: str) -> str:
@@ -28,5 +35,5 @@ def decrypt_field_safe(ciphertext: str | None) -> str | None:
         return None
     try:
         return decrypt_field(ciphertext)
-    except (InvalidToken, Exception):
+    except InvalidToken:
         return None

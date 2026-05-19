@@ -32,10 +32,10 @@ from app.api.v1.schemas.personal_data import (
     EducationRecordCreate,
     EducationRecordResponse,
     EducationRecordUpdate,
-    EmployeeContactResponse,
-    EmployeeContactUpdate,
     EmergencyContactResponse,
     EmergencyContactUpdate,
+    EmployeeContactResponse,
+    EmployeeContactUpdate,
     FamilyMemberCreate,
     FamilyMemberResponse,
     FamilyMemberUpdate,
@@ -173,6 +173,59 @@ def _serialize_crs(rows: list[Any]) -> list[dict[str, Any]]:
     return [_serialize_cr(r) for r in rows]
 
 
+async def _get_user_email(db: DBSession, user_id: uuid.UUID) -> str:
+    from sqlalchemy import select
+
+    from app.infrastructure.models import User
+
+    result = await db.execute(select(User.email).where(User.id == user_id))
+    return (result.scalar_one_or_none() or "").lower()
+
+
+async def _get_hr_email_for_work_location(
+    db: DBSession,
+    hr_employee_id: uuid.UUID | None,
+) -> str | None:
+    if hr_employee_id is None:
+        return None
+
+    from sqlalchemy import select
+
+    from app.infrastructure.models import Employee, User
+
+    result = await db.execute(
+        select(User.email)
+        .join(Employee, Employee.user_id == User.id)
+        .where(Employee.id == hr_employee_id)
+    )
+    email = result.scalar_one_or_none()
+    return email.lower() if email else None
+
+
+async def _resolve_hr_email(
+    db: DBSession,
+    redis: RedisClient,
+    employee: EmployeeDomain,
+) -> str:
+    from sqlalchemy import select
+
+    from app.infrastructure.models import WorkLocation
+
+    if not employee.work_location_id:
+        return ""
+
+    result = await db.execute(
+        select(WorkLocation).where(WorkLocation.id == employee.work_location_id)
+    )
+    work_location = result.scalar_one_or_none()
+    if not work_location:
+        return ""
+
+    fallback_email = await _get_hr_email_for_work_location(db, work_location.hr_employee_id)
+    service = _get_pd_service(db, redis)
+    return await service._get_hr_email(work_location.name, fallback_email)
+
+
 # ---------------------------------------------------------------------------
 # /profile/full
 # ---------------------------------------------------------------------------
@@ -277,7 +330,7 @@ async def patch_citizenship(
         field_name="citizenship_country",
         old_value=old_val,
         new_value=body.model_dump(),
-        hr_email="",  # resolved by caller via work_location
+        hr_email=await _resolve_hr_email(db, redis, employee),
         comment=None,
     )
     await db.commit()
@@ -777,20 +830,6 @@ async def create_change_request(
     redis: RedisClient,
     request: Request,
 ) -> dict[str, Any]:
-    # Resolve HR email from work location
-    from sqlalchemy import select
-
-    from app.infrastructure.models import WorkLocation
-
-    hr_email = ""
-    if employee.work_location_id:
-        stmt = select(WorkLocation).where(WorkLocation.id == employee.work_location_id)
-        result = await db.execute(stmt)
-        wl = result.scalar_one_or_none()
-        if wl:
-            pd_service = _get_pd_service(db, redis)
-            hr_email = await pd_service._get_hr_email(wl.name, None)
-
     service = _get_cr_service(db, redis)
     cr = await service.create_request(
         employee_id=employee.id,
@@ -798,7 +837,7 @@ async def create_change_request(
         field_name=body.field_name,
         old_value=body.old_value,
         new_value=body.new_value,
-        hr_email=hr_email,
+        hr_email=await _resolve_hr_email(db, redis, employee),
         comment=body.comment,
         document_url=body.document_url,
     )
@@ -844,18 +883,12 @@ async def hr_list_change_requests(
     redis: RedisClient,
     status: str | None = Query(default=None),
 ) -> dict[str, Any]:
-    # Resolve HR's own email for filtering
-    from sqlalchemy import select
-
-    from app.infrastructure.models import User
-
-    stmt = select(User).where(User.id == hr_employee.user_id)
-    result = await db.execute(stmt)
-    user = result.scalar_one_or_none()
-    hr_email = user.email if user else ""
-
     service = _get_cr_service(db, redis)
-    rows = await service.list_for_hr(hr_email, status)
+    rows = await service.list_for_reviewer(
+        await _get_user_email(db, hr_employee.user_id),
+        is_admin=hr_employee.role == "admin",
+        status=status,
+    )
     return {"items": _serialize_crs(rows), "total": len(rows)}
 
 
@@ -867,7 +900,11 @@ async def hr_get_change_request(
     redis: RedisClient,
 ) -> dict[str, Any]:
     service = _get_cr_service(db, redis)
-    cr = await service.get_request(request_id)
+    cr = await service.get_request_for_reviewer(
+        request_id,
+        await _get_user_email(db, hr_employee.user_id),
+        is_admin=hr_employee.role == "admin",
+    )
     return {"change_request": _serialize_cr(cr)}
 
 
@@ -884,7 +921,8 @@ async def hr_approve_change_request(
     cr = await service.approve_request(
         request_id=request_id,
         hr_employee_id=hr_employee.id,
-        hr_email="",
+        hr_email=await _get_user_email(db, hr_employee.user_id),
+        is_admin=hr_employee.role == "admin",
         hr_comment=body.hr_comment,
         actor_user_id=hr_employee.user_id,
         ip=get_client_ip(request),
@@ -908,6 +946,8 @@ async def hr_reject_change_request(
         request_id=request_id,
         hr_employee_id=hr_employee.id,
         reason=body.reason,
+        hr_email=await _get_user_email(db, hr_employee.user_id),
+        is_admin=hr_employee.role == "admin",
         actor_user_id=hr_employee.user_id,
         ip=get_client_ip(request),
         db_session=db,

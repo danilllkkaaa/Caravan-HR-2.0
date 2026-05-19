@@ -74,6 +74,8 @@ services:
         mc alias set local http://minio:9000 minioadmin minioadmin &&
         mc mb --ignore-existing local/portal-documents &&
         mc mb --ignore-existing local/portal-avatars &&
+        mc mb --ignore-existing local/sick-leave-documents &&
+        mc mb --ignore-existing local/personal-data-documents &&
         mc anonymous set download local/portal-avatars &&
         echo 'MinIO buckets ready'
       "

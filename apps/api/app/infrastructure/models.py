@@ -84,7 +84,7 @@ ChangeRequestStatusEnum = Enum(
     create_type=False,
 )
 ChangeRequestSectionEnum = Enum(
-    "basic_data", "citizenship", "document", "address", "education",
+    "basic_data", "citizenship", "document", "address", "contacts", "education",
     "family", "emergency_contact", "social_info", "medical", "bank", "other",
     name="change_request_section",
     create_type=False,
@@ -162,6 +162,7 @@ class TimestampMixin:
 
 class User(UUIDPKMixin, TimestampMixin, Base):
     __tablename__ = "users"
+    __table_args__ = (Index("ix_users_email", "email"),)
 
     email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
@@ -179,6 +180,9 @@ class User(UUIDPKMixin, TimestampMixin, Base):
 
 class Department(UUIDPKMixin, Base):
     __tablename__ = "departments"
+    __table_args__ = (
+        Index("uq_departments_external_id_1c", "external_id_1c", unique=True),
+    )
 
     external_id_1c: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -186,12 +190,17 @@ class Department(UUIDPKMixin, Base):
         UUID(as_uuid=True), ForeignKey("departments.id"), nullable=True
     )
     head_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("employees.id"), nullable=True
+        UUID(as_uuid=True),
+        ForeignKey("employees.id", name="fk_departments_head_id", use_alter=True),
+        nullable=True,
     )
 
 
 class Position(UUIDPKMixin, Base):
     __tablename__ = "positions"
+    __table_args__ = (
+        Index("uq_positions_external_id_1c", "external_id_1c", unique=True),
+    )
 
     external_id_1c: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -204,7 +213,9 @@ class WorkLocation(UUIDPKMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     city: Mapped[str] = mapped_column(String(128), nullable=False)
     hr_employee_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("employees.id"), nullable=True
+        UUID(as_uuid=True),
+        ForeignKey("employees.id", name="fk_work_locations_hr_employee_id", use_alter=True),
+        nullable=True,
     )
 
 
@@ -307,7 +318,10 @@ class Employee(UUIDPKMixin, TimestampMixin, Base):
 
 class Holiday(Base):
     __tablename__ = "holidays"
-    __table_args__ = (UniqueConstraint("date", name="uq_holidays_date"),)
+    __table_args__ = (
+        UniqueConstraint("date", name="uq_holidays_date"),
+        Index("ix_holidays_date", "date"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     date: Mapped[date] = mapped_column(Date, nullable=False)
@@ -410,7 +424,11 @@ class AttendanceEvent(Base):
         Index("ix_attendance_events_hikvision_person_id", "hikvision_person_id"),
     )
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        BigInteger().with_variant(Integer, "sqlite"),
+        primary_key=True,
+        autoincrement=True,
+    )
     employee_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("employees.id"), nullable=True
     )
@@ -470,7 +488,7 @@ class Notification(UUIDPKMixin, Base):
 class RefreshToken(UUIDPKMixin, Base):
     __tablename__ = "refresh_tokens"
     __table_args__ = (
-        Index("ix_refresh_tokens_token_hash", "token_hash"),
+        Index("ix_refresh_tokens_token_hash", "token_hash", unique=True),
         Index("ix_refresh_tokens_user_revoked", "user_id", "revoked_at"),
         Index("ix_refresh_tokens_expires_at", "expires_at"),
     )
@@ -497,7 +515,11 @@ class AuditLog(Base):
         Index("ix_audit_log_created_at", "created_at"),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        BigInteger().with_variant(Integer, "sqlite"),
+        primary_key=True,
+        autoincrement=True,
+    )
     actor_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
     )

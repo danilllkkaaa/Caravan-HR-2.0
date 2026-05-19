@@ -40,10 +40,15 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 15
       JWT_REFRESH_TOKEN_EXPIRE_DAYS: 30
+      FERNET_KEY: ${FERNET_KEY}
       MINIO_ENDPOINT: minio:9000
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
       MINIO_BUCKET_SICK_LEAVE: ${MINIO_BUCKET_SICK_LEAVE:-sick-leave-documents}
+      MINIO_BUCKET_PERSONAL_DATA: ${MINIO_BUCKET_PERSONAL_DATA:-personal-data-documents}
+      MINIO_PUBLIC_SECURE: ${MINIO_PUBLIC_SECURE:-true}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USERNAME: ${SMTP_USERNAME}
@@ -81,11 +86,17 @@ services:
       APP_ENV: production
       APP_SECRET_KEY: ${APP_SECRET_KEY}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      FERNET_KEY: ${FERNET_KEY}
       CELERY_BROKER_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
       CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD}@redis:6379/2
       MINIO_ENDPOINT: minio:9000
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      MINIO_BUCKET_SICK_LEAVE: ${MINIO_BUCKET_SICK_LEAVE:-sick-leave-documents}
+      MINIO_BUCKET_PERSONAL_DATA: ${MINIO_BUCKET_PERSONAL_DATA:-personal-data-documents}
+      MINIO_PUBLIC_SECURE: ${MINIO_PUBLIC_SECURE:-true}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USERNAME: ${SMTP_USERNAME}
@@ -180,6 +191,22 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: portal-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} &&
+        mc mb --ignore-existing local/${MINIO_BUCKET_SICK_LEAVE:-sick-leave-documents} &&
+        mc mb --ignore-existing local/${MINIO_BUCKET_PERSONAL_DATA:-personal-data-documents} &&
+        echo 'MinIO buckets ready'
+      "
+    restart: on-failure
+    logging: *default-logging
 
   prometheus:
     image: prom/prometheus:latest

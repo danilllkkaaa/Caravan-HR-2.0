@@ -538,7 +538,9 @@ async def _reset_demo_rows(session: AsyncSession, employees: dict[str, Employee]
             delete(model).where(model.employee_id.in_(employee_ids)).where(predicate)
         )
 
-    await session.execute(delete(TimesheetEntry).where(TimesheetEntry.employee_id.in_(employee_ids)))
+    await session.execute(
+        delete(TimesheetEntry).where(TimesheetEntry.employee_id.in_(employee_ids))
+    )
     await session.execute(
         delete(Holiday).where(
             Holiday.date.in_(

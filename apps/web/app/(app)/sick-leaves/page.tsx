@@ -16,7 +16,6 @@ const FILTER_OPTIONS: Array<{ value: SickLeaveStatus | 'all'; label: string }> =
   { value: 'all', label: 'Все' },
   { value: SickLeaveStatus.Open, label: 'Открытые' },
   { value: SickLeaveStatus.Closed, label: 'Закрытые' },
-  { value: SickLeaveStatus.Confirmed, label: 'Подтверждённые' },
 ];
 
 function SickLeaveCard({ sickLeave }: { sickLeave: SickLeave }) {

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, timedelta
+from datetime import date
 
 import structlog
 
 from app.core.config import get_settings
 from app.core.exceptions import ConflictError, ForbiddenError, NotFoundError
+from app.core.minio import generate_upload_url as generate_presigned_upload_url
 from app.domain.models import SickLeaveDomain
 from app.domain.repositories import AbstractSickLeaveRepository
 
@@ -95,25 +96,12 @@ class SickLeaveService:
             raise NotFoundError(message="Sick leave not found")
         self._check_write_access(sl, requester_employee_id, role)
 
-        from minio import Minio
-
-        client = Minio(
-            settings.minio_endpoint,
-            access_key=settings.minio_access_key,
-            secret_key=settings.minio_secret_key,
-            secure=settings.minio_secure,
+        url, object_key = generate_presigned_upload_url(
+            settings.minio_bucket_sick_leave,
+            prefix=f"sick-leave/{sick_leave_id}",
+            expires_seconds=3600,
         )
-        object_name = f"sick-leave/{sick_leave_id}/{filename}"
-        url = client.presigned_put_object(
-            bucket_name=settings.minio_bucket_sick_leave,
-            object_name=object_name,
-            expires=timedelta(hours=1),
-        )
-        public_url = (
-            f"{'https' if settings.minio_secure else 'http'}://"
-            f"{settings.minio_endpoint}/{settings.minio_bucket_sick_leave}/{object_name}"
-        )
-        return {"upload_url": url, "object_url": public_url}
+        return {"upload_url": url, "object_url": object_key}
 
     async def list_for_employee(
         self, employee_id: uuid.UUID, offset: int, limit: int

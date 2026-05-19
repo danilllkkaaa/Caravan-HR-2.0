@@ -17,6 +17,12 @@ const STATUS_STYLES: Record<string, string> = {
   closed: 'bg-gray-100 text-gray-600 border-gray-200',
   confirmed: 'bg-success-100 text-success-700 border-success-200',
   // TimesheetStatus
+  work: 'bg-success-100 text-success-700 border-success-200',
+  overtime: 'bg-accent-100 text-accent-700 border-accent-200',
+  partial: 'bg-orange-100 text-orange-700 border-orange-200',
+  absence: 'bg-danger-100 text-danger-700 border-danger-200',
+  vacation: 'bg-blue-100 text-blue-700 border-blue-200',
+  sick: 'bg-warning-100 text-warning-700 border-warning-200',
   present: 'bg-success-100 text-success-700 border-success-200',
   absent: 'bg-danger-100 text-danger-700 border-danger-200',
   holiday: 'bg-purple-100 text-purple-700 border-purple-200',
@@ -29,6 +35,12 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
+  work: 'На работе',
+  overtime: 'Сверхурочно',
+  partial: 'Неполный день',
+  absence: 'Отсутствие',
+  vacation: 'Отпуск',
+  sick: 'Больничный',
   draft: 'Черновик',
   pending: 'На рассмотрении',
   approved: 'Утверждён',

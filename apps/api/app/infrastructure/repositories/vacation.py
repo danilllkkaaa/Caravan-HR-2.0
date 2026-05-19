@@ -8,6 +8,7 @@ from typing import Any
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import InsufficientBalanceError
 from app.domain.models import (
     VacationBalanceDomain,
     VacationRequestDomain,
@@ -165,12 +166,20 @@ class VacationRepository(AbstractVacationRepository):
         stmt = select(VacationBalance).where(
             VacationBalance.employee_id == employee_id,
             VacationBalance.year == year,
-        )
+        ).with_for_update()
         result = await self._session.execute(stmt)
         balance = result.scalar_one_or_none()
         if balance is None:
-            raise ValueError(f"No vacation balance for employee {employee_id} year {year}")
-        balance.used_days = balance.used_days + Decimal(str(days))
+            raise InsufficientBalanceError(
+                details={"available": 0, "requested": float(days)}
+            )
+        requested = Decimal(str(days))
+        available = balance.total_days - balance.used_days
+        if available < requested:
+            raise InsufficientBalanceError(
+                details={"available": float(available), "requested": float(requested)}
+            )
+        balance.used_days = balance.used_days + requested
         await self._session.flush()
         await self._session.refresh(balance)
         return _balance_to_domain(balance)
@@ -181,7 +190,7 @@ class VacationRepository(AbstractVacationRepository):
         stmt = select(VacationBalance).where(
             VacationBalance.employee_id == employee_id,
             VacationBalance.year == year,
-        )
+        ).with_for_update()
         result = await self._session.execute(stmt)
         balance = result.scalar_one_or_none()
         if balance is None:

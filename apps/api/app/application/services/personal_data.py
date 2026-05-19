@@ -54,6 +54,52 @@ _HR_ROUTING_OVERRIDES: dict[str, list[str]] = {
     "Ашыктас": ["hr.ashyktas@caravanresources.com"],
 }
 
+CHANGE_REQUEST_EDITABLE_FIELDS: dict[str, set[str]] = {
+    "basic_data": {
+        "first_name_en",
+        "last_name_en",
+        "middle_name_en",
+        "gender",
+        "nationality",
+        "place_of_birth",
+        "marital_status",
+    },
+    "citizenship": {
+        "citizenship_country",
+        "status",
+        "iin_in_country",
+        "is_primary",
+    },
+    "address": {
+        "country",
+        "region",
+        "city",
+        "street",
+        "house",
+        "apartment",
+    },
+    "contacts": {
+        "email",
+        "mobile_phone",
+        "home_phone",
+        "additional_phone",
+    },
+    "social_info": {
+        "pension_status",
+        "has_disability",
+        "disability_group",
+        "is_ww2_veteran",
+        "is_ww2_family",
+        "document_url",
+    },
+    "emergency_contact": {
+        "full_name",
+        "phone",
+        "address",
+        "relationship",
+    },
+}
+
 
 def _cache_key(section: str, employee_id: uuid.UUID) -> str:
     return f"profile:{section}:{employee_id}"
@@ -426,6 +472,20 @@ class ChangeRequestService:
     ) -> list[PersonalDataChangeRequest]:
         return await self._cr_repo.list_for_hr(hr_email, status)
 
+    async def list_for_reviewer(
+        self, hr_email: str, is_admin: bool, status: str | None = None
+    ) -> list[PersonalDataChangeRequest]:
+        if is_admin:
+            return await self._cr_repo.list_all(status)
+        return await self._cr_repo.list_for_hr(hr_email, status)
+
+    async def get_request_for_reviewer(
+        self, request_id: uuid.UUID, hr_email: str, is_admin: bool
+    ) -> PersonalDataChangeRequest:
+        row = await self.get_request(request_id)
+        self._ensure_reviewer_access(row, hr_email, is_admin)
+        return row
+
     async def cancel_request(
         self, request_id: uuid.UUID, employee_id: uuid.UUID
     ) -> PersonalDataChangeRequest:
@@ -447,10 +507,14 @@ class ChangeRequestService:
         actor_user_id: uuid.UUID | None = None,
         ip: str = "unknown",
         db_session: Any = None,
+        is_admin: bool = False,
     ) -> PersonalDataChangeRequest:
         row = await self._cr_repo.get(request_id)
         if row is None:
             raise NotFoundError(message=f"ChangeRequest {request_id} not found")
+        self._ensure_reviewer_access(row, hr_email, is_admin)
+        if row.status not in ("sent", "under_review"):
+            raise ValidationError(message="Only sent or under_review requests can be approved.")
 
         # Apply field change to target table
         await self._apply_change(row)
@@ -507,10 +571,15 @@ class ChangeRequestService:
         actor_user_id: uuid.UUID | None = None,
         ip: str = "unknown",
         db_session: Any = None,
+        hr_email: str = "",
+        is_admin: bool = False,
     ) -> PersonalDataChangeRequest:
         row = await self._cr_repo.get(request_id)
         if row is None:
             raise NotFoundError(message=f"ChangeRequest {request_id} not found")
+        self._ensure_reviewer_access(row, hr_email, is_admin)
+        if row.status not in ("sent", "under_review"):
+            raise ValidationError(message="Only sent or under_review requests can be rejected.")
 
         now = datetime.now(UTC)
         row = await self._cr_repo.update_status(
@@ -554,37 +623,108 @@ class ChangeRequestService:
     async def _apply_change(self, row: PersonalDataChangeRequest) -> None:
         """Apply the approved change to the appropriate table."""
         section = row.section
-        new_val = row.new_value  # dict
+        if not isinstance(row.new_value, dict):
+            raise ValidationError(message="Change request new_value must be an object.")
+
+        new_val = row.new_value
         emp_id = row.employee_id
 
-        try:
-            if section == "basic_data":
-                await self._pd_repo.upsert_personal_data(
-                    emp_id,
-                    {row.field_name: new_val.get("value")},
-                    source="hr_approved",
-                )
-            elif section == "address":
-                address_type = new_val.get("address_type", "registration")
-                data = {k: v for k, v in new_val.items() if k != "address_type"}
-                data["data_source"] = "hr_approved"
-                await self._pd_repo.upsert_address(emp_id, address_type, data)
-            elif section == "social_info":
-                data = dict(new_val)
-                data["data_source"] = "hr_approved"
-                await self._pd_repo.upsert_social_info(emp_id, data)
-            elif section == "emergency_contact":
-                await self._pd_repo.upsert_emergency_contact(emp_id, new_val)
-            else:
-                log.info(
-                    "Change request approved but no auto-apply handler for section",
-                    section=section,
-                    request_id=str(row.id),
-                )
-        except Exception as exc:
-            log.warning(
-                "Failed to auto-apply change request",
-                section=section,
-                request_id=str(row.id),
-                error=str(exc),
+        if section == "basic_data":
+            await self._pd_repo.upsert_personal_data(
+                emp_id,
+                self._extract_field_update(section, row.field_name, new_val),
+                source="hr_approved",
             )
+            return
+
+        if section == "citizenship":
+            data = self._extract_bulk_update(section, new_val)
+            records = await self._pd_repo.get_citizenship_records(emp_id)
+            data["data_source"] = "hr_approved"
+            if records:
+                await self._pd_repo.update_citizenship_record(records[0].id, data)
+            else:
+                data["employee_id"] = emp_id
+                data.setdefault("citizenship_country", "")
+                data.setdefault("status", "rk_citizen")
+                await self._pd_repo.add_citizenship_record(data)
+            return
+
+        if section == "address":
+            address_type = str(new_val.get("address_type", "registration"))
+            if address_type not in ("registration", "residence"):
+                raise ValidationError(message="address_type must be registration or residence.")
+            data = self._extract_bulk_update(section, new_val, ignore={"address_type"})
+            data["data_source"] = "hr_approved"
+            await self._pd_repo.upsert_address(emp_id, address_type, data)
+            return
+
+        if section == "contacts":
+            data = self._extract_bulk_update(section, new_val)
+            data["data_source"] = "hr_approved"
+            contact = await self._pd_repo.get_employee_contact(emp_id)
+            if contact is None:
+                data.setdefault("email", "")
+                data.setdefault("mobile_phone", "")
+            await self._pd_repo.upsert_employee_contact(emp_id, data)
+            return
+
+        if section == "social_info":
+            data = self._extract_bulk_update(section, new_val)
+            data["data_source"] = "hr_approved"
+            await self._pd_repo.upsert_social_info(emp_id, data)
+            return
+
+        if section == "emergency_contact":
+            data = self._extract_bulk_update(section, new_val)
+            existing = await self._pd_repo.get_emergency_contact(emp_id)
+            if existing is None:
+                data.setdefault("full_name", "")
+                data.setdefault("phone", "")
+                data.setdefault("relationship", "")
+            await self._pd_repo.upsert_emergency_contact(emp_id, data)
+            return
+
+        raise ValidationError(
+            message=f"Auto-apply is not implemented for change request section '{section}'."
+        )
+
+    @staticmethod
+    def _ensure_reviewer_access(
+        row: PersonalDataChangeRequest, hr_email: str, is_admin: bool
+    ) -> None:
+        if is_admin:
+            return
+        if not hr_email or row.hr_email.lower() != hr_email.lower():
+            raise ForbiddenError(message="Change request is assigned to another HR reviewer.")
+
+    @staticmethod
+    def _extract_field_update(
+        section: str, field_name: str, new_value: dict[str, Any]
+    ) -> dict[str, Any]:
+        allowed = CHANGE_REQUEST_EDITABLE_FIELDS.get(section, set())
+        if field_name not in allowed:
+            raise ValidationError(message=f"Field '{field_name}' cannot be updated in {section}.")
+        return {field_name: new_value.get("value")}
+
+    @staticmethod
+    def _extract_bulk_update(
+        section: str,
+        new_value: dict[str, Any],
+        ignore: set[str] | None = None,
+    ) -> dict[str, Any]:
+        ignored = ignore or set()
+        allowed = CHANGE_REQUEST_EDITABLE_FIELDS.get(section, set())
+        data = {
+            key: value
+            for key, value in new_value.items()
+            if key in allowed and key not in ignored
+        }
+        unknown = set(new_value) - allowed - ignored
+        if unknown:
+            raise ValidationError(
+                message=f"Unsupported fields for {section}: {sorted(unknown)}"
+            )
+        if not data:
+            raise ValidationError(message=f"No supported fields provided for {section}.")
+        return data
