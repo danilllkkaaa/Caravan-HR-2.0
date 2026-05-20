@@ -133,9 +133,6 @@ web-build/
 android/
 ios/
 
-# ===== Docker =====
-.dockerignore
-
 # ===== Environment Files =====
 .env
 .env.local
@@ -166,6 +163,7 @@ $RECYCLE.BIN/
 !.vscode/settings.json
 *.sublime-project
 *.sublime-workspace
+.claude/
 
 # ===== Coverage =====
 coverage/
@@ -186,6 +184,9 @@ infra/certbot/
 
 # ===== MinIO data =====
 infra/docker/data/
+
+# ===== Local artifacts =====
+artifacts/git/
 
 # ===== Misc =====
 *.swp

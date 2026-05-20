@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS base
+FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -8,18 +8,26 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev \
+    ca-certificates \
+    curl \
     gcc \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-FROM base AS deps
 COPY pyproject.toml ./
-RUN pip install hatchling && pip install -e ".[dev]"
+COPY alembic.ini ./
+COPY alembic ./alembic
+COPY app ./app
 
-FROM deps AS production
-COPY . .
+RUN pip install --upgrade pip \
+    && pip install . \
+    && python -m compileall app
 
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+RUN addgroup --system appgroup \
+    && adduser --system --ingroup appgroup --home /app appuser \
+    && mkdir -p /app/logs \
+    && chown -R appuser:appgroup /app
+
 USER appuser
 
 EXPOSE 8000
