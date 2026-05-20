@@ -13,7 +13,7 @@ x-api-build: &api-build
 x-api-env: &api-env
   APP_ENV: ${APP_ENV:-development}
   APP_SECRET_KEY: ${APP_SECRET_KEY:-caravan-hr-local-secret}
-  APP_ALLOWED_ORIGINS: ${APP_ALLOWED_ORIGINS:-["http://localhost:3100","http://127.0.0.1:3100"]}
+  APP_ALLOWED_ORIGINS: "${APP_ALLOWED_ORIGINS:-http://localhost:3100,http://127.0.0.1:3100}"
   DATABASE_URL: postgresql+asyncpg://portal:${POSTGRES_PASSWORD:-portal_password}@postgres:5432/portal
   REDIS_URL: redis://:${REDIS_PASSWORD:-portal_redis_password}@redis:6379/0
   JWT_SECRET_KEY: ${JWT_SECRET_KEY:-caravan-hr-local-jwt-secret}
@@ -66,7 +66,7 @@ services:
     environment:
       <<: *api-env
     ports:
-      - "${API_PORT:-8001}:8000"
+      - "127.0.0.1:${API_PORT:-8001}:8000"
     volumes:
       - api_logs:/app/logs
     depends_on:
